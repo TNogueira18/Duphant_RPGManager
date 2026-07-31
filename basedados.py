@@ -1,363 +1,330 @@
 import sqlite3
 
 
-DATABASE = "rpg.db"
-
-
-def criar_base_dados():
-
-    ligacao = sqlite3.connect(DATABASE)
-    cursor = ligacao.cursor()
-
-    # Ativar Foreign Keys
-    cursor.execute("""
-        PRAGMA foreign_keys = ON;
-    """)
-
-
-    # ==========================
-    # RACES
-    # ==========================
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Races (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        description TEXT
-    );
-    """)
-
-
-    # ==========================
-    # PLAYERS
-    # ==========================
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Players (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        nickname TEXT
-    );
-    """)
-
-
-    # ==========================
-    # CLASSES
-    # ==========================
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Classes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        description TEXT
-    );
-    """)
-
-
-    # ==========================
-    # LOCATIONS
-    # ==========================
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Locations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        nivel_perigo INTEGER,
-        localizacao TEXT
-    );
-    """)
-
-
-    # ==========================
-    # LEVELS
-    # ==========================
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Levels (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        xp_required INTEGER NOT NULL,
-        bonus INTEGER
-    );
-    """)
-
-
-    # ==========================
-    # CHARACTERS
-    # ==========================
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Characters (
-
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        player_id INTEGER,
-        raca INTEGER,
-        classe INTEGER,
-        constituition INTEGER,
-        dexterity INTEGER,
-        strength INTEGER,
-        wisdom INTEGER,
-        inteligence INTEGER,
-        charisma INTEGER,
-        ouro INTEGER DEFAULT 0,
-        stamina INTEGER,
-        stamina_max INTEGER,
-        mana INTEGER,
-        mana_max INTEGER,
-        vida INTEGER,
-        vida_max INTEGER,
-        level INTEGER DEFAULT 1,
-
-        FOREIGN KEY(player_id)
-            REFERENCES Players(id),
-        FOREIGN KEY(raca)
-            REFERENCES Races(id),
-        FOREIGN KEY(classe)
-            REFERENCES Classes(id),
-        FOREIGN KEY(level)
-            REFERENCES Levels(id)
-
-    );
-    """)
-
-
-    # ==========================
-    # ITEMS
-    # ==========================
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Items (
-
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        description TEXT,
-        dmg INTEGER,
-        stat_used TEXT
-
-    );
-    """)
-
-
-    # ==========================
-    # NPCs
-    # ==========================
+class Database:
+
+    DATABASE = "rpg.db"
+
+    def __init__(self):
+        self.ligacao = sqlite3.connect(self.DATABASE)
+        self.cursor = self.ligacao.cursor()
+
+        # Ativar Foreign Keys
+        self.cursor.execute("PRAGMA foreign_keys = ON;")
+
+
+    def criar_base_dados(self):
+
+        # ==========================
+        # RACES
+        # ==========================
+
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Races (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            description TEXT
+        );
+        """)
+
+
+        # ==========================
+        # PLAYERS
+        # ==========================
+
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Players (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            nickname TEXT
+        );
+        """)
+
+
+        # ==========================
+        # CLASSES
+        # ==========================
+
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Classes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            description TEXT
+        );
+        """)
+
+
+        # ==========================
+        # LOCATIONS
+        # ==========================
+
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Locations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            nivel_perigo INTEGER,
+            localizacao TEXT
+        );
+        """)
+
+
+        # ==========================
+        # LEVELS
+        # ==========================
+
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Levels (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            xp_required INTEGER NOT NULL,
+            bonus INTEGER
+        );
+        """)
+
+
+        # ==========================
+        # CHARACTERS
+        # ==========================
+
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Characters (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            player_id INTEGER,
+            raca INTEGER,
+            classe INTEGER,
+            constituition INTEGER,
+            dexterity INTEGER,
+            strength INTEGER,
+            wisdom INTEGER,
+            inteligence INTEGER,
+            charisma INTEGER,
+            ouro INTEGER DEFAULT 0,
+            stamina INTEGER,
+            stamina_max INTEGER,
+            mana INTEGER,
+            mana_max INTEGER,
+            vida INTEGER,
+            vida_max INTEGER,
+            level INTEGER DEFAULT 1,
+
+            FOREIGN KEY(player_id) REFERENCES Players(id),
+            FOREIGN KEY(raca) REFERENCES Races(id),
+            FOREIGN KEY(classe) REFERENCES Classes(id),
+            FOREIGN KEY(level) REFERENCES Levels(id)
+
+        );
+        """)
+
+
+        # ==========================
+        # ITEMS
+        # ==========================
+
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Items (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            description TEXT,
+            dmg INTEGER,
+            hp INTEGER,
+            stat_used TEXT
+
+        );
+        """)
+
+
+        # ==========================
+        # NPCs
+        # ==========================
+
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS NPCs (
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS NPCs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            raca INTEGER,
+            trabalho TEXT,
+            constituition INTEGER,
+            dexterity INTEGER,
+            strength INTEGER,
+            wisdom INTEGER,
+            inteligence INTEGER,
+            charisma INTEGER,
+            vida INTEGER,
+            vida_max INTEGER,
+            ouro INTEGER,
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        raca INTEGER,
-        trabalho TEXT,
-        constituition INTEGER,
-        dexterity INTEGER,
-        strength INTEGER,
-        wisdom INTEGER,
-        inteligence INTEGER,
-        charisma INTEGER,
-        vida INTEGER,
-        vida_max INTEGER,
-        ouro INTEGER,
+            FOREIGN KEY(raca) REFERENCES Races(id)
 
-        FOREIGN KEY(raca)
-            REFERENCES Races(id)
+        );
+        """)
 
-    );
-    """)
 
+        # ==========================
+        # MONSTROS
+        # ==========================
 
-    # ==========================
-    # MONSTROS
-    # ==========================
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Monstros (
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Monstros (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            descricao TEXT,
+            xp_reward INTEGER,
+            constituition INTEGER,
+            dexterity INTEGER,
+            strength INTEGER,
+            wisdom INTEGER,
+            inteligence INTEGER,
+            charisma INTEGER,
+            mana INTEGER,
+            mana_max INTEGER,
+            stamina INTEGER,
+            stamina_max INTEGER,
+            vida INTEGER,
+            vida_max INTEGER
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        descricao TEXT,
-        xp_reward INTEGER,
-        constituition INTEGER,
-        dexterity INTEGER,
-        strength INTEGER,
-        wisdom INTEGER,
-        inteligence INTEGER,
-        charisma INTEGER,
-        mana INTEGER,
-        mana_max INTEGER,
-        stamina INTEGER,
-        stamina_max INTEGER,
-        vida INTEGER,
-        vida_max INTEGER
+        );
+        """)
 
-    );
-    """)
 
+        # ==========================
+        # SKILLS
+        # ==========================
 
-    # ==========================
-    # SKILLS
-    # ==========================
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Skills (
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Skills (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            description TEXT,
+            stamina_cost INTEGER,
+            cooldown INTEGER
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        description TEXT,
-        stamina_cost INTEGER
+        );
+        """)
 
-    );
-    """)
 
+        # ==========================
+        # FEATS
+        # ==========================
 
-    # ==========================
-    # FEATS
-    # ==========================
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Feats (
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Feats (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            description TEXT
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        description TEXT
+        );
+        """)
 
-    );
-    """)
 
+        # ==========================
+        # SPELLS
+        # ==========================
 
-    # ==========================
-    # SPELLS
-    # ==========================
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Spells (
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Spells (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            description TEXT,
+            mana_cost INTEGER,
+            cooldown INTEGER
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        description TEXT,
-        mana_cost INTEGER
+        );
+        """)
 
-    );
-    """)
 
+        # =================================================
+        # TABELAS DE LIGAÇÃO
+        # =================================================
 
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Character_Items (
 
-    # =================================================
-    # TABELAS DE LIGAÇÃO
-    # =================================================
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            character_id INTEGER,
+            item_id INTEGER,
+            quantidade INTEGER DEFAULT 1,
 
+            FOREIGN KEY(character_id) REFERENCES Characters(id),
+            FOREIGN KEY(item_id) REFERENCES Items(id)
 
-    # Character Items
+        );
+        """)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Character_Items (
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        character_id INTEGER,
-        item_id INTEGER,
-        quantidade INTEGER DEFAULT 1,
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Character_Skills (
 
-        FOREIGN KEY(character_id)
-            REFERENCES Characters(id),
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            character_id INTEGER,
+            skill_id INTEGER,
+            nivel INTEGER DEFAULT 1,
 
-        FOREIGN KEY(item_id)
-            REFERENCES Items(id)
+            FOREIGN KEY(character_id) REFERENCES Characters(id),
+            FOREIGN KEY(skill_id) REFERENCES Skills(id)
 
-    );
-    """)
+        );
+        """)
 
 
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Character_Feats (
 
-    # Character Skills
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            character_id INTEGER,
+            feat_id INTEGER,
+            nivel INTEGER DEFAULT 1,
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Character_Skills (
+            FOREIGN KEY(character_id) REFERENCES Characters(id),
+            FOREIGN KEY(feat_id) REFERENCES Feats(id)
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        character_id INTEGER,
-        skill_id INTEGER,
-        nivel INTEGER DEFAULT 1,
+        );
+        """)
 
-        FOREIGN KEY(character_id)
-            REFERENCES Characters(id),
 
-        FOREIGN KEY(skill_id)
-            REFERENCES Skills(id)
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Character_Spells (
 
-    );
-    """)
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            character_id INTEGER,
+            spell_id INTEGER,
 
+            FOREIGN KEY(character_id) REFERENCES Characters(id),
+            FOREIGN KEY(spell_id) REFERENCES Spells(id)
 
+        );
+        """)
 
-    # Character Feats
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Character_Feats (
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Location_Monsters (
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        character_id INTEGER,
-        feat_id INTEGER,
-        nivel INTEGER DEFAULT 1,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            location_id INTEGER,
+            monster_id INTEGER,
 
-        FOREIGN KEY(character_id)
-            REFERENCES Characters(id),
+            FOREIGN KEY(location_id) REFERENCES Locations(id),
+            FOREIGN KEY(monster_id) REFERENCES Monstros(id)
 
-        FOREIGN KEY(feat_id)
-            REFERENCES Feats(id)
+        );
+        """)
 
-    );
-    """)
 
+        self.ligacao.commit()
+        print("Base de dados criada com sucesso!")
 
 
-    # Character Spells
+    def fechar(self):
+        self.ligacao.close()
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Character_Spells (
-
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        character_id INTEGER,
-        spell_id INTEGER,
-
-        FOREIGN KEY(character_id)
-            REFERENCES Characters(id),
-
-        FOREIGN KEY(spell_id)
-            REFERENCES Spells(id)
-
-    );
-    """)
-
-
-
-    # Monsters Locations
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Location_Monsters (
-
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        location_id INTEGER,
-        monster_id INTEGER,
-
-        FOREIGN KEY(location_id)
-            REFERENCES Locations(id),
-
-        FOREIGN KEY(monster_id)
-            REFERENCES Monstros(id)
-
-    );
-    """)
-
-
-
-    ligacao.commit()
-    ligacao.close()
-
-
-    print("Base de dados criada com sucesso!")
-
-
-# Executar criação
 
 if __name__ == "__main__":
-    criar_base_dados()
+    db = Database()
+    db.criar_base_dados()
+    db.fechar()
