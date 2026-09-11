@@ -1,5 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox
+import sqlite3
+import hashlib
+import os
+import basedados
 
 
 # =========================================================
@@ -9,7 +13,10 @@ from tkinter import messagebox
 FORMULARIO_LARGURA = 2 / 3
 FORMULARIO_ALTURA = 2 / 3
 
-# Cores
+MARGEM_X = 20
+ESPACO_LABEL = 4
+ESPACO_WIDGET = 18
+
 FUNDO_APLICACAO = "#808080"
 FUNDO_FORMULARIO = "#202020"
 FUNDO_WIDGET = "#404040"
@@ -34,6 +41,7 @@ janela.title("RPG Manager")
 
 # Janela maximizada
 janela.state("zoomed")
+basedados.Database()
 
 # Fundo cinzento
 janela.configure(
@@ -156,7 +164,7 @@ def mostrar_login():
         text="Endereço de email",
         font=("Arial", 10, "bold"),
         fg=BRANCO,
-        bg=FUNDO_WIDGET,
+        bg=FUNDO_FORMULARIO,
         anchor="w"
     )
 
@@ -195,7 +203,7 @@ def mostrar_login():
         text="Palavra-passe",
         font=("Arial", 10, "bold"),
         fg=BRANCO,
-        bg=FUNDO_WIDGET,
+        bg=FUNDO_FORMULARIO,
         anchor="w"
     )
 
@@ -227,49 +235,6 @@ def mostrar_login():
     )
 
     # =====================================================
-    # CHECKBOX
-    # =====================================================
-
-    manter_conta = tk.BooleanVar(value=False)
-
-    frame_checkbox = tk.Frame(
-        frame,
-        bg=CINZENTO_TEXTO
-    )
-
-    frame_checkbox.grid(
-        row=5,
-        column=0,
-        sticky="ew",
-        padx=MARGEM_X,
-        pady=(0, 20)
-    )
-
-    frame_checkbox.columnconfigure(0, weight=1)
-
-    checkbox = tk.Checkbutton(
-        frame_checkbox,
-        text="Manter conta aberta neste dispositivo",
-        variable=manter_conta,
-        font=("Arial", 10),
-        fg=BRANCO,
-        bg=CINZENTO_TEXTO,
-        activebackground=CINZENTO_TEXTO,
-        activeforeground=BRANCO,
-        selectcolor=CINZENTO_TEXTO,
-        anchor="w",
-        relief="flat"
-    )
-
-    checkbox.grid(
-        row=0,
-        column=0,
-        sticky="w",
-        padx=8,
-        pady=35
-    )
-
-    # =====================================================
     # LINK
     # =====================================================
 
@@ -278,7 +243,7 @@ def mostrar_login():
         text="Ainda não tem uma conta? Criar Conta",
         font=("Arial", 10, "underline"),
         fg=BRANCO,
-        bg=FUNDO_WIDGET,
+        bg=FUNDO_FORMULARIO,
         cursor="hand2"
     )
 
@@ -302,6 +267,10 @@ def mostrar_login():
         email = entrada_email.get().strip()
         password = entrada_password.get()
 
+        # ==========================
+        # VALIDAR CAMPOS
+        # ==========================
+
         if email == "":
             messagebox.showwarning(
                 "Atenção",
@@ -318,10 +287,90 @@ def mostrar_login():
             entrada_password.focus()
             return
 
+        # ==========================
+        # LIGAR À BASE DE DADOS
+        # ==========================
+
+        try:
+
+            ligacao = sqlite3.connect("rpg.db")
+            cursor = ligacao.cursor()
+
+            # Procurar utilizador pelo email
+            cursor.execute("""
+                SELECT id, nome, email, password
+                FROM Utilizadores
+                WHERE email = ?
+            """, (email,))
+
+            utilizador = cursor.fetchone()
+
+            ligacao.close()
+
+        except sqlite3.Error as erro:
+
+            messagebox.showerror(
+                "Erro",
+                f"Erro ao aceder à base de dados:\n{erro}"
+            )
+
+            return
+
+        # ==========================
+        # UTILIZADOR NÃO ENCONTRADO
+        # ==========================
+
+        if utilizador is None:
+            messagebox.showerror(
+                "Login",
+                "Email ou palavra-passe incorretos."
+            )
+
+            entrada_password.delete(0, tk.END)
+            entrada_password.focus()
+
+            return
+
+        # ==========================
+        # DADOS DO UTILIZADOR
+        # ==========================
+
+        utilizador_id = utilizador[0]
+        nome = utilizador[1]
+        email_bd = utilizador[2]
+        password_guardada = utilizador[3]
+
+        # ==========================
+        # VERIFICAR PASSWORD
+        # ==========================
+
+        if not basedados.Seguranca.verificar_password(
+                password,
+                password_guardada
+        ):
+            messagebox.showerror(
+                "Login",
+                "Email ou palavra-passe incorretos."
+            )
+
+            entrada_password.delete(0, tk.END)
+            entrada_password.focus()
+
+            return
+
+        # ==========================
+        # LOGIN BEM-SUCEDIDO
+        # ==========================
+
         messagebox.showinfo(
             "Login",
-            "Login efetuado com sucesso!"
+            f"Login efetuado com sucesso!\n\n"
+            f"Bem-vindo, {nome}!"
         )
+
+        print("ID:", utilizador_id)
+        print("Nome:", nome)
+        print("Email:", email_bd)
 
     botao_entrar = tk.Button(
         frame,
@@ -343,38 +392,6 @@ def mostrar_login():
         sticky="ew",
         padx=MARGEM_X,
         pady=(0, 15)
-    )
-
-    # =====================================================
-    # TEXTO INFERIOR
-    # =====================================================
-
-    texto_privacidade = tk.Label(
-        frame,
-        text="O seu nome de perfil no Game será partilhado. Nunca envie palavras-passe.",
-        font=("Arial", 7),
-        fg=CINZENTO_TEXTO,
-        bg=FUNDO_WIDGET
-    )
-
-    texto_privacidade.grid(
-        row=8,
-        column=0,
-        pady=(0, 3)
-    )
-
-    texto_protecao = tk.Label(
-        frame,
-        text="Saiba como processamos os seus dados",
-        font=("Arial", 7, "underline"),
-        fg=BRANCO,
-        bg=FUNDO_WIDGET,
-        cursor="hand2"
-    )
-
-    texto_protecao.grid(
-        row=9,
-        column=0
     )
 
     entrada_email.focus()
@@ -686,12 +703,18 @@ def mostrar_registo():
         # FUTURA LIGAÇÃO À DATABASE
         # -------------------------------------------------
 
-        print("================================")
-        print("REGISTO")
-        print("Nome:", nome)
-        print("Email:", email)
-        print("Password:", password)
-        print("================================")
+        password_hash = basedados.Seguranca.criar_hash(password)
+
+        ligacao = sqlite3.connect("rpg.db")
+        cursor = ligacao.cursor()
+
+        cursor.execute("""
+            INSERT INTO Utilizadores (nome, email, password)
+            VALUES (?, ?, ?)
+        """, (nome, email, password_hash))
+
+        ligacao.commit()
+        ligacao.close()
 
         messagebox.showinfo(
             "Conta criada",
@@ -725,38 +748,6 @@ def mostrar_registo():
         sticky="ew",
         padx=MARGEM_X,
         pady=(0, 15)
-    )
-
-    # =====================================================
-    # TEXTO INFERIOR
-    # =====================================================
-
-    texto_privacidade = tk.Label(
-        frame,
-        text="O seu nome de perfil no Game será partilhado. Nunca envie palavras-passe.",
-        font=("Arial", 7),
-        fg=CINZENTO_TEXTO,
-        bg=FUNDO_FORMULARIO
-    )
-
-    texto_privacidade.grid(
-        row=11,
-        column=0,
-        pady=(0, 3)
-    )
-
-    texto_protecao = tk.Label(
-        frame,
-        text="Saiba como processamos os seus dados",
-        font=("Arial", 7, "underline"),
-        fg=BRANCO,
-        bg=FUNDO_FORMULARIO,
-        cursor="hand2"
-    )
-
-    texto_protecao.grid(
-        row=12,
-        column=0
     )
 
     # =====================================================
