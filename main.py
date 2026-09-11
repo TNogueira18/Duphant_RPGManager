@@ -31,6 +31,57 @@ MARGEM_X = 20
 ESPACO_LABEL = 4
 ESPACO_WIDGET = 18
 
+utilizador_atual_id = None
+personagem_selecionada_id = None
+
+
+# =========================================================
+# Funções
+# =========================================================
+
+# ======================================================
+# LOGOUT
+# ======================================================
+
+def fazer_logout():
+
+    global utilizador_atual_id
+    global personagem_selecionada_id
+
+    resposta = messagebox.askyesno(
+        "Logout",
+        "Tem a certeza que pretende terminar a sessão?"
+    )
+
+    if not resposta:
+        return
+
+    # Limpar sessão
+    utilizador_atual_id = None
+    personagem_selecionada_id = None
+
+    # Voltar ao login
+    mostrar_login()
+
+
+# ======================================================
+# SAIR DA APLICAÇÃO
+# ======================================================
+
+def sair_aplicacao():
+
+    resposta = messagebox.askyesno(
+        "Sair",
+        "Tem a certeza que pretende sair da aplicação?"
+    )
+
+    if not resposta:
+        return
+
+    janela.destroy()
+
+
+
 # =========================================================
 # JANELA
 # =========================================================
@@ -47,13 +98,6 @@ basedados.Database()
 janela.configure(
     bg=FUNDO_APLICACAO
 )
-
-
-# =========================================================
-# FUNÇÕES
-# =========================================================
-
-
 
 # =========================================================
 # LIMPAR JANELA
@@ -128,139 +172,328 @@ def mostrar_login():
 
     frame = criar_frame_principal()
 
-    # =====================================================
-    # CONFIGURAÇÃO DO GRID
-    # =====================================================
+    # ======================================================
+    # ESTRUTURA PRINCIPAL
+    # ======================================================
 
-    frame.columnconfigure(0, weight=1)
+    frame.grid_rowconfigure(0, weight=0)   # topo
+    frame.grid_rowconfigure(1, weight=1)   # conteúdo
+    frame.grid_rowconfigure(2, weight=0)   # rodapé
 
-    # =====================================================
-    # TÍTULO
-    # =====================================================
-
-    titulo = tk.Label(
-        frame,
-        text="Entrar na sua Conta",
-        font=("Arial", 26),
-        fg=BRANCO,
-        bg=FUNDO_FORMULARIO,
-        anchor="w"
+    frame.grid_columnconfigure(
+        0,
+        weight=1
     )
 
-    titulo.grid(
+
+    # ======================================================
+    # TOPO
+    # ======================================================
+
+    frame_topo = tk.Frame(
+        frame,
+        bg=FUNDO_FORMULARIO
+    )
+
+    frame_topo.grid(
         row=0,
         column=0,
-        sticky="w",
-        padx=MARGEM_X,
-        pady=(30, 25)
+        sticky="ew"
     )
 
-    # =====================================================
-    # EMAIL
-    # =====================================================
+    frame_topo.grid_columnconfigure(
+        0,
+        weight=1
+    )
 
-    label_email = tk.Label(
-        frame,
-        text="Endereço de email",
+
+    # ------------------------------------------------------
+    # TÍTULO
+    # ------------------------------------------------------
+
+    label_titulo = tk.Label(
+        frame_topo,
+        text="RPG Manager",
+        font=("Arial", 18, "bold"),
+        bg=FUNDO_FORMULARIO,
+        fg=BRANCO
+    )
+
+    label_titulo.grid(
+        row=0,
+        column=0,
+        padx=20,
+        pady=20,
+        sticky="w"
+    )
+
+
+    # ------------------------------------------------------
+    # BOTÃO SAIR
+    # ------------------------------------------------------
+
+    botao_sair = tk.Button(
+        frame_topo,
+        text="Sair",
         font=("Arial", 10, "bold"),
         fg=BRANCO,
+        bg=VERMELHO,
+        activeforeground=BRANCO,
+        activebackground=VERMELHO_ATIVO,
+        relief="solid",
+        bd=2,
+        cursor="hand2",
+        command=sair_aplicacao
+    )
+
+    botao_sair.grid(
+        row=0,
+        column=1,
+        padx=20,
+        pady=15
+    )
+
+
+    # ======================================================
+    # ÁREA DE CONTEÚDO
+    # ======================================================
+
+    frame_conteudo = tk.Frame(
+        frame,
+        bg=FUNDO_FORMULARIO
+    )
+
+    frame_conteudo.grid(
+        row=1,
+        column=0,
+        sticky="nsew"
+    )
+
+    frame_conteudo.grid_columnconfigure(
+        0,
+        weight=1
+    )
+
+
+    # ------------------------------------------------------
+    # FRAME DOS CAMPOS
+    # ------------------------------------------------------
+
+    frame_formulario = tk.Frame(
+        frame_conteudo,
+        bg=FUNDO_FORMULARIO
+    )
+
+    frame_formulario.grid(
+        row=0,
+        column=0,
+        padx=80,
+        pady=40,
+        sticky="ew"
+    )
+
+    frame_formulario.grid_columnconfigure(
+        0,
+        weight=1
+    )
+
+
+    # ======================================================
+    # TÍTULO
+    # ======================================================
+
+    label_login = tk.Label(
+        frame_formulario,
+        text="Entrar na sua Conta",
+        font=("Arial", 22, "bold"),
         bg=FUNDO_FORMULARIO,
-        anchor="w"
+        fg=BRANCO
+    )
+
+    label_login.grid(
+        row=0,
+        column=0,
+        pady=(0, 35)
+    )
+
+
+    # ======================================================
+    # EMAIL
+    # ======================================================
+
+    label_email = tk.Label(
+        frame_formulario,
+        text="Endereço de email",
+        font=("Arial", 11),
+        bg=FUNDO_FORMULARIO,
+        fg=BRANCO
     )
 
     label_email.grid(
         row=1,
         column=0,
         sticky="w",
-        padx=MARGEM_X,
-        pady=(0, ESPACO_LABEL)
+        pady=(0, 6)
     )
 
+
     entrada_email = tk.Entry(
-        frame,
+        frame_formulario,
         font=("Arial", 12),
-        fg=BRANCO,
         bg=FUNDO_WIDGET,
+        fg=BRANCO,
         insertbackground=BRANCO,
         relief="solid",
-        bd=1
+        bd=1,
+        highlightthickness=1,
+        highlightbackground="#555555",
+        highlightcolor=ROXO
     )
 
     entrada_email.grid(
         row=2,
         column=0,
         sticky="ew",
-        padx=MARGEM_X,
-        pady=(0, ESPACO_WIDGET)
+        pady=(0, 25),
+        ipady=8
     )
 
-    # =====================================================
+
+    # ======================================================
     # PASSWORD
-    # =====================================================
+    # ======================================================
 
     label_password = tk.Label(
-        frame,
+        frame_formulario,
         text="Palavra-passe",
-        font=("Arial", 10, "bold"),
-        fg=BRANCO,
+        font=("Arial", 11),
         bg=FUNDO_FORMULARIO,
-        anchor="w"
+        fg=BRANCO
     )
 
     label_password.grid(
         row=3,
         column=0,
         sticky="w",
-        padx=MARGEM_X,
-        pady=(0, ESPACO_LABEL)
+        pady=(0, 6)
     )
 
+
     entrada_password = tk.Entry(
-        frame,
+        frame_formulario,
         font=("Arial", 12),
-        fg=BRANCO,
         bg=FUNDO_WIDGET,
+        fg=BRANCO,
         insertbackground=BRANCO,
+        show="*",
         relief="solid",
         bd=1,
-        show="*"
+        highlightthickness=1,
+        highlightbackground="#555555",
+        highlightcolor=ROXO
     )
 
     entrada_password.grid(
         row=4,
         column=0,
         sticky="ew",
-        padx=MARGEM_X,
-        pady=(0, 25)
+        pady=(0, 25),
+        ipady=8
     )
 
-    # =====================================================
-    # LINK
-    # =====================================================
 
-    link_criar_conta = tk.Label(
+    # ======================================================
+    # CHECKBOX
+    # ======================================================
+
+    frame_opcoes = tk.Frame(
+        frame_formulario,
+        bg=FUNDO_FORMULARIO
+    )
+
+    frame_opcoes.grid(
+        row=5,
+        column=0,
+        sticky="w",
+        pady=(0, 20)
+    )
+
+    lembrar_var = tk.BooleanVar()
+
+    checkbox_lembrar = tk.Checkbutton(
+        frame_opcoes,
+        text="Lembrar sessão",
+        variable=lembrar_var,
+        font=("Arial", 10),
+        bg=FUNDO_FORMULARIO,
+        fg=BRANCO,
+        activebackground=FUNDO_FORMULARIO,
+        activeforeground=BRANCO,
+        selectcolor=FUNDO_WIDGET
+    )
+
+    checkbox_lembrar.pack()
+
+
+    # ======================================================
+    # ESPAÇO EXPANSÍVEL
+    # ======================================================
+
+    frame_conteudo.grid_rowconfigure(
+        0,
+        weight=1
+    )
+
+
+    # ======================================================
+    # RODAPÉ
+    # ======================================================
+
+    frame_rodape = tk.Frame(
         frame,
+        bg=FUNDO_FORMULARIO
+    )
+
+    frame_rodape.grid(
+        row=2,
+        column=0,
+        sticky="ew"
+    )
+
+    frame_rodape.grid_columnconfigure(
+        0,
+        weight=1
+    )
+
+
+    # ======================================================
+    # LINK
+    # ======================================================
+
+    link_registo = tk.Label(
+        frame_rodape,
         text="Ainda não tem uma conta? Criar Conta",
         font=("Arial", 10, "underline"),
-        fg=BRANCO,
         bg=FUNDO_FORMULARIO,
+        fg=AZUL,
         cursor="hand2"
     )
 
-    link_criar_conta.grid(
-        row=6,
+    link_registo.grid(
+        row=0,
         column=0,
-        pady=(0, 10)
+        pady=(0, 15)
     )
 
-    link_criar_conta.bind(
+    link_registo.bind(
         "<Button-1>",
         lambda event: mostrar_registo()
     )
 
-    # =====================================================
+
+    # ======================================================
     # BOTÃO ENTRAR
-    # =====================================================
+    # ======================================================
 
     def fazer_login():
 
@@ -356,6 +589,8 @@ def mostrar_login():
             entrada_password.delete(0, tk.END)
             entrada_password.focus()
 
+
+
             return
 
         # ==========================
@@ -368,31 +603,54 @@ def mostrar_login():
             f"Bem-vindo, {nome}!"
         )
 
-        print("ID:", utilizador_id)
-        print("Nome:", nome)
-        print("Email:", email_bd)
+        global utilizador_atual_id
+
+        utilizador_atual_id = utilizador_id
+
+        mostrar_personagens()
 
     botao_entrar = tk.Button(
-        frame,
+        frame_rodape,
         text="Entrar",
         font=("Arial", 11, "bold"),
         fg=BRANCO,
         bg=AZUL,
-        activebackground="#0000CC",
+        activebackground=AZUL_ATIVO,
         activeforeground=BRANCO,
-        relief="flat",
-        bd=0,
+        relief="solid",
+        bd=2,
         cursor="hand2",
         command=fazer_login
     )
 
     botao_entrar.grid(
-        row=7,
+        row=1,
         column=0,
+        padx=40,
+        pady=(0, 20),
         sticky="ew",
-        padx=MARGEM_X,
-        pady=(0, 15)
+        ipady=8
     )
+
+
+    # ======================================================
+    # FOOTER
+    # ======================================================
+
+    label_footer = tk.Label(
+        frame_rodape,
+        text="RPG Manager © 2026",
+        font=("Arial", 9),
+        bg=FUNDO_FORMULARIO,
+        fg=CINZENTO_TEXTO
+    )
+
+    label_footer.grid(
+        row=2,
+        column=0,
+        pady=(0, 10)
+    )
+
 
     entrada_email.focus()
 
@@ -401,366 +659,636 @@ def mostrar_login():
 # REGISTO
 # =========================================================
 
+# ======================================================
+# REGISTO
+# ======================================================
+
 def mostrar_registo():
 
     limpar_janela()
 
     frame = criar_frame_principal()
 
-    # =====================================================
-    # CONFIGURAÇÃO DO GRID
-    # =====================================================
+    # ======================================================
+    # ESTRUTURA PRINCIPAL
+    # ======================================================
 
-    frame.columnconfigure(0, weight=1)
+    frame.grid_rowconfigure(0, weight=0)   # topo
+    frame.grid_rowconfigure(1, weight=1)   # conteúdo
+    frame.grid_rowconfigure(2, weight=0)   # rodapé
 
-    # =====================================================
-    # TÍTULO
-    # =====================================================
-
-    titulo = tk.Label(
-        frame,
-        text="Criar Conta",
-        font=("Arial", 26),
-        fg=BRANCO,
-        bg=FUNDO_FORMULARIO,
-        anchor="w"
+    frame.grid_columnconfigure(
+        0,
+        weight=1
     )
 
-    titulo.grid(
+
+    # ======================================================
+    # BARRA SUPERIOR
+    # ======================================================
+
+    frame_topo = tk.Frame(
+        frame,
+        bg=FUNDO_FORMULARIO
+    )
+
+    frame_topo.grid(
         row=0,
         column=0,
-        sticky="w",
-        padx=MARGEM_X,
-        pady=(30, 25)
+        sticky="ew"
     )
 
-    # =====================================================
-    # NOME DE UTILIZADOR
-    # =====================================================
+    frame_topo.grid_columnconfigure(
+        0,
+        weight=1
+    )
 
-    label_nome = tk.Label(
-        frame,
-        text="Nome de Utilizador",
+
+    # ======================================================
+    # TÍTULO SUPERIOR
+    # ======================================================
+
+    label_titulo = tk.Label(
+        frame_topo,
+        text="RPG Manager",
+        font=("Arial", 18, "bold"),
+        bg=FUNDO_FORMULARIO,
+        fg=BRANCO
+    )
+
+    label_titulo.grid(
+        row=0,
+        column=0,
+        padx=20,
+        pady=20,
+        sticky="w"
+    )
+
+
+    # ======================================================
+    # BOTÃO SAIR
+    # ======================================================
+
+    botao_sair = tk.Button(
+        frame_topo,
+        text="Sair",
         font=("Arial", 10, "bold"),
         fg=BRANCO,
+        bg=VERMELHO,
+        activeforeground=BRANCO,
+        activebackground=VERMELHO_ATIVO,
+        relief="solid",
+        bd=2,
+        cursor="hand2",
+        command=sair_aplicacao
+    )
+
+    botao_sair.grid(
+        row=0,
+        column=1,
+        padx=20,
+        pady=15
+    )
+
+
+    # ======================================================
+    # ÁREA DE CONTEÚDO
+    # ======================================================
+
+    frame_conteudo = tk.Frame(
+        frame,
+        bg=FUNDO_FORMULARIO
+    )
+
+    frame_conteudo.grid(
+        row=1,
+        column=0,
+        sticky="nsew"
+    )
+
+    frame_conteudo.grid_columnconfigure(
+        0,
+        weight=1
+    )
+
+    frame_conteudo.grid_rowconfigure(
+        0,
+        weight=1
+    )
+
+
+    # ======================================================
+    # FORMULÁRIO
+    # ======================================================
+
+    frame_formulario = tk.Frame(
+        frame_conteudo,
+        bg=FUNDO_FORMULARIO
+    )
+
+    frame_formulario.grid(
+        row=0,
+        column=0,
+        padx=80,
+        pady=40,
+        sticky="ew"
+    )
+
+    frame_formulario.grid_columnconfigure(
+        0,
+        weight=1
+    )
+
+
+    # ======================================================
+    # TÍTULO
+    # ======================================================
+
+    label_registo = tk.Label(
+        frame_formulario,
+        text="Criar Conta",
+        font=("Arial", 22, "bold"),
         bg=FUNDO_FORMULARIO,
-        anchor="w"
+        fg=BRANCO
+    )
+
+    label_registo.grid(
+        row=0,
+        column=0,
+        pady=(0, 30)
+    )
+
+
+    # ======================================================
+    # NOME
+    # ======================================================
+
+    label_nome = tk.Label(
+        frame_formulario,
+        text="Nome de Utilizador",
+        font=("Arial", 11),
+        bg=FUNDO_FORMULARIO,
+        fg=BRANCO
     )
 
     label_nome.grid(
         row=1,
         column=0,
         sticky="w",
-        padx=MARGEM_X,
-        pady=(0, ESPACO_LABEL)
+        pady=(0, 6)
     )
 
+
     entrada_nome = tk.Entry(
-        frame,
+        frame_formulario,
         font=("Arial", 12),
-        fg=BRANCO,
         bg=FUNDO_WIDGET,
+        fg=BRANCO,
         insertbackground=BRANCO,
         relief="solid",
-        bd=1
+        bd=1,
+        highlightthickness=1,
+        highlightbackground="#555555",
+        highlightcolor=ROXO
     )
 
     entrada_nome.grid(
         row=2,
         column=0,
         sticky="ew",
-        padx=MARGEM_X,
-        pady=(0, ESPACO_WIDGET)
+        ipady=8,
+        pady=(0, 20)
     )
 
-    # =====================================================
+
+    # ======================================================
     # EMAIL
-    # =====================================================
+    # ======================================================
 
     label_email = tk.Label(
-        frame,
+        frame_formulario,
         text="Endereço de email",
-        font=("Arial", 10, "bold"),
-        fg=BRANCO,
+        font=("Arial", 11),
         bg=FUNDO_FORMULARIO,
-        anchor="w"
+        fg=BRANCO
     )
 
     label_email.grid(
         row=3,
         column=0,
         sticky="w",
-        padx=MARGEM_X,
-        pady=(0, ESPACO_LABEL)
+        pady=(0, 6)
     )
 
+
     entrada_email = tk.Entry(
-        frame,
+        frame_formulario,
         font=("Arial", 12),
-        fg=BRANCO,
         bg=FUNDO_WIDGET,
+        fg=BRANCO,
         insertbackground=BRANCO,
         relief="solid",
-        bd=1
+        bd=1,
+        highlightthickness=1,
+        highlightbackground="#555555",
+        highlightcolor=ROXO
     )
 
     entrada_email.grid(
         row=4,
         column=0,
         sticky="ew",
-        padx=MARGEM_X,
-        pady=(0, ESPACO_WIDGET)
+        ipady=8,
+        pady=(0, 20)
     )
 
-    # =====================================================
+
+    # ======================================================
     # PASSWORD
-    # =====================================================
+    # ======================================================
 
     label_password = tk.Label(
-        frame,
+        frame_formulario,
         text="Palavra-passe",
-        font=("Arial", 10, "bold"),
-        fg=BRANCO,
+        font=("Arial", 11),
         bg=FUNDO_FORMULARIO,
-        anchor="w"
+        fg=BRANCO
     )
 
     label_password.grid(
         row=5,
         column=0,
         sticky="w",
-        padx=MARGEM_X,
-        pady=(0, ESPACO_LABEL)
+        pady=(0, 6)
     )
 
+
     entrada_password = tk.Entry(
-        frame,
+        frame_formulario,
         font=("Arial", 12),
-        fg=BRANCO,
         bg=FUNDO_WIDGET,
+        fg=BRANCO,
         insertbackground=BRANCO,
+        show="*",
         relief="solid",
         bd=1,
-        show="*"
+        highlightthickness=1,
+        highlightbackground="#555555",
+        highlightcolor=ROXO
     )
 
     entrada_password.grid(
         row=6,
         column=0,
         sticky="ew",
-        padx=MARGEM_X,
-        pady=(0, ESPACO_WIDGET)
+        ipady=8,
+        pady=(0, 20)
     )
 
-    # =====================================================
+
+    # ======================================================
     # CONFIRMAR PASSWORD
-    # =====================================================
+    # ======================================================
 
-    label_confirmar = tk.Label(
-        frame,
+    label_confirmar_password = tk.Label(
+        frame_formulario,
         text="Confirmar palavra-passe",
-        font=("Arial", 10, "bold"),
-        fg=BRANCO,
+        font=("Arial", 11),
         bg=FUNDO_FORMULARIO,
-        anchor="w"
+        fg=BRANCO
     )
 
-    label_confirmar.grid(
+    label_confirmar_password.grid(
         row=7,
         column=0,
         sticky="w",
-        padx=MARGEM_X,
-        pady=(0, ESPACO_LABEL)
+        pady=(0, 6)
     )
 
-    entrada_confirmar = tk.Entry(
-        frame,
+
+    entrada_confirmar_password = tk.Entry(
+        frame_formulario,
         font=("Arial", 12),
-        fg=BRANCO,
         bg=FUNDO_WIDGET,
+        fg=BRANCO,
         insertbackground=BRANCO,
+        show="*",
         relief="solid",
         bd=1,
-        show="*"
+        highlightthickness=1,
+        highlightbackground="#555555",
+        highlightcolor=ROXO
     )
 
-    entrada_confirmar.grid(
+    entrada_confirmar_password.grid(
         row=8,
         column=0,
         sticky="ew",
-        padx=MARGEM_X,
-        pady=(0, 25)
-    )
-
-    # =====================================================
-    # LINK PARA LOGIN
-    # =====================================================
-
-    link_entrar = tk.Label(
-        frame,
-        text="Já tem uma conta? Entrar",
-        font=("Arial", 10, "underline"),
-        fg=BRANCO,
-        bg=FUNDO_FORMULARIO,
-        cursor="hand2"
-    )
-
-    link_entrar.grid(
-        row=9,
-        column=0,
+        ipady=8,
         pady=(0, 10)
     )
 
-    link_entrar.bind(
+
+    # ======================================================
+    # RODAPÉ
+    # ======================================================
+
+    frame_rodape = tk.Frame(
+        frame,
+        bg=FUNDO_FORMULARIO
+    )
+
+    frame_rodape.grid(
+        row=2,
+        column=0,
+        sticky="ew"
+    )
+
+    frame_rodape.grid_columnconfigure(
+        0,
+        weight=1
+    )
+
+
+    # ======================================================
+    # LINK PARA LOGIN
+    # ======================================================
+
+    link_login = tk.Label(
+        frame_rodape,
+        text="Já tem uma conta? Entrar",
+        font=("Arial", 10, "underline"),
+        bg=FUNDO_FORMULARIO,
+        fg=AZUL,
+        cursor="hand2"
+    )
+
+    link_login.grid(
+        row=0,
+        column=0,
+        pady=(0, 15)
+    )
+
+    link_login.bind(
         "<Button-1>",
         lambda event: mostrar_login()
     )
 
-    # =====================================================
+
+    # ======================================================
     # BOTÃO REGISTAR
-    # =====================================================
+    # ======================================================
 
     def fazer_registo():
 
         nome = entrada_nome.get().strip()
         email = entrada_email.get().strip()
         password = entrada_password.get()
-        confirmar = entrada_confirmar.get()
+        confirmar_password = entrada_confirmar_password.get()
 
-        # -------------------------------------------------
+
+        # ==============================================
         # VALIDAR NOME
-        # -------------------------------------------------
+        # ==============================================
 
         if nome == "":
+
             messagebox.showwarning(
                 "Atenção",
-                "Introduza um nome de utilizador."
+                "Introduza o nome de utilizador."
             )
+
             entrada_nome.focus()
+
             return
 
-        # -------------------------------------------------
+
+        # ==============================================
         # VALIDAR EMAIL
-        # -------------------------------------------------
+        # ==============================================
 
         if email == "":
+
             messagebox.showwarning(
                 "Atenção",
-                "Introduza um endereço de email."
+                "Introduza o endereço de email."
             )
+
             entrada_email.focus()
+
             return
 
+
         if "@" not in email:
+
             messagebox.showwarning(
                 "Atenção",
                 "Introduza um endereço de email válido."
             )
+
             entrada_email.focus()
+
             return
 
-        # -------------------------------------------------
+
+        # ==============================================
         # VALIDAR PASSWORD
-        # -------------------------------------------------
+        # ==============================================
 
         if password == "":
+
             messagebox.showwarning(
                 "Atenção",
                 "Introduza uma palavra-passe."
             )
+
             entrada_password.focus()
+
             return
 
+
         if len(password) < 6:
+
             messagebox.showwarning(
                 "Atenção",
                 "A palavra-passe deve ter pelo menos 6 caracteres."
             )
+
             entrada_password.focus()
+
             return
 
-        # -------------------------------------------------
-        # CONFIRMAR PASSWORD
-        # -------------------------------------------------
 
-        if confirmar == "":
+        # ==============================================
+        # CONFIRMAR PASSWORD
+        # ==============================================
+
+        if confirmar_password == "":
+
             messagebox.showwarning(
                 "Atenção",
                 "Confirme a palavra-passe."
             )
-            entrada_confirmar.focus()
+
+            entrada_confirmar_password.focus()
+
             return
 
-        if password != confirmar:
-            messagebox.showerror(
-                "Erro",
+
+        if password != confirmar_password:
+
+            messagebox.showwarning(
+                "Atenção",
                 "As palavras-passe não coincidem."
             )
-            entrada_confirmar.focus()
+
+            entrada_confirmar_password.focus()
+
             return
 
-        # -------------------------------------------------
-        # LIGAÇÃO À DATABASE
-        # -------------------------------------------------
 
-        password_hash = basedados.Seguranca.criar_hash(password)
+        # ==============================================
+        # VERIFICAR SE EMAIL JÁ EXISTE
+        # ==============================================
 
-        ligacao = sqlite3.connect("rpg.db")
-        cursor = ligacao.cursor()
+        ligacao = None
 
-        cursor.execute("""
-            INSERT INTO Utilizadores (nome, email, password)
-            VALUES (?, ?, ?)
-        """, (nome, email, password_hash))
+        try:
 
-        ligacao.commit()
-        ligacao.close()
+            ligacao = sqlite3.connect("rpg.db")
+
+            cursor = ligacao.cursor()
+
+            cursor.execute("""
+                SELECT id
+                FROM Utilizadores
+                WHERE email = ?
+            """, (email,))
+
+            utilizador_existente = cursor.fetchone()
+
+            if utilizador_existente is not None:
+
+                ligacao.close()
+                ligacao = None
+
+                messagebox.showwarning(
+                    "Atenção",
+                    "Já existe uma conta com este endereço de email."
+                )
+
+                entrada_email.focus()
+
+                return
+
+
+            # ==========================================
+            # CRIAR HASH DA PASSWORD
+            # ==========================================
+
+            password_hash = basedados.Seguranca.criar_hash(
+                password
+            )
+
+
+            # ==========================================
+            # INSERIR UTILIZADOR
+            # ==========================================
+
+            cursor.execute("""
+                INSERT INTO Utilizadores (
+                    nome,
+                    email,
+                    password
+                )
+                VALUES (?, ?, ?)
+            """, (
+                nome,
+                email,
+                password_hash
+            ))
+
+            ligacao.commit()
+
+            ligacao.close()
+            ligacao = None
+
+        except sqlite3.Error as erro:
+
+            if ligacao is not None:
+
+                ligacao.rollback()
+                ligacao.close()
+
+            messagebox.showerror(
+                "Erro",
+                f"Não foi possível criar a conta:\n\n{erro}"
+            )
+
+            return
+
+
+        # ==============================================
+        # REGISTO CONCLUÍDO
+        # ==============================================
 
         messagebox.showinfo(
             "Conta criada",
-            "A conta foi criada com sucesso!"
+            "A conta foi criada com sucesso!\n\n"
+            "Agora pode iniciar sessão."
         )
 
-        # Voltar para o login
         mostrar_login()
 
-    # =====================================================
-    # BOTÃO
-    # =====================================================
 
     botao_registar = tk.Button(
-        frame,
+        frame_rodape,
         text="Registar-se",
         font=("Arial", 11, "bold"),
         fg=BRANCO,
-        bg=AZUL,
-        activebackground="#0000CC",
+        bg=VERDE,
         activeforeground=BRANCO,
-        relief="flat",
-        bd=0,
+        activebackground=VERDE_ATIVO,
+        relief="solid",
+        bd=2,
         cursor="hand2",
         command=fazer_registo
     )
 
     botao_registar.grid(
-        row=10,
+        row=1,
         column=0,
+        padx=40,
+        pady=(0, 20),
         sticky="ew",
-        padx=MARGEM_X,
-        pady=(0, 15)
+        ipady=8
     )
 
-    # =====================================================
+
+    # ======================================================
+    # FOOTER
+    # ======================================================
+
+    label_footer = tk.Label(
+        frame_rodape,
+        text="RPG Manager © 2026",
+        font=("Arial", 9),
+        bg=FUNDO_FORMULARIO,
+        fg=CINZENTO_TEXTO
+    )
+
+    label_footer.grid(
+        row=2,
+        column=0,
+        pady=(0, 10)
+    )
+
+
+    # ======================================================
     # FOCUS
-    # =====================================================
+    # ======================================================
 
     entrada_nome.focus()
-
-    # ENTER = REGISTAR
-    janela.bind(
-        "<Return>",
-        lambda event: fazer_registo()
-    )
 
 
 
@@ -856,9 +1384,21 @@ def criar_frame_principal():
     return frame
 
 
+
+
+
+
+
 # ==========================================================
 # GESTÃO DE PERSONAGENS
 # ==========================================================
+
+
+
+
+
+
+
 
 def mostrar_personagens():
 
@@ -870,12 +1410,105 @@ def mostrar_personagens():
     # ESTRUTURA PRINCIPAL
     # ======================================================
 
-    frame.grid_rowconfigure(0, weight=1)
-    frame.grid_rowconfigure(1, weight=0)
+    frame.grid_rowconfigure(0, weight=0)
+    frame.grid_rowconfigure(1, weight=1)
+    frame.grid_rowconfigure(2, weight=0)
 
     frame.grid_columnconfigure(0, weight=0)
     frame.grid_columnconfigure(1, weight=1)
 
+    # ======================================================
+    # BARRA SUPERIOR
+    # ======================================================
+
+    frame_topo = tk.Frame(
+        frame,
+        bg=FUNDO_FORMULARIO,
+        height=60
+    )
+
+    frame_topo.grid(
+        row=0,
+        column=0,
+        columnspan=2,
+        sticky="ew"
+    )
+
+    frame_topo.grid_columnconfigure(
+        0,
+        weight=1
+    )
+
+    # ======================================================
+    # Barra Superior - Título
+    # ======================================================
+
+    label_titulo = tk.Label(
+        frame_topo,
+        text="Gestão de Personagens",
+        font=("Arial", 18, "bold"),
+        bg=FUNDO_FORMULARIO,
+        fg=BRANCO
+    )
+
+    label_titulo.grid(
+        row=0,
+        column=0,
+        padx=20,
+        pady=10,
+        sticky="w"
+    )
+
+    # ======================================================
+    # Barra Superior - Botão Logout
+    # ======================================================
+
+    botao_logout = tk.Button(
+        frame_topo,
+        text="Logout",
+        font=("Arial", 10, "bold"),
+        fg=BRANCO,
+        bg=ROXO,
+        activeforeground=BRANCO,
+        activebackground="#6419A8",
+        relief="solid",
+        bd=2,
+        cursor="hand2",
+        command=fazer_logout
+    )
+
+    botao_logout.grid(
+        row=0,
+        column=1,
+        padx=(10, 5),
+        pady=10
+    )
+
+
+    # ======================================================
+    # Barra Superior - Botão Sair
+    # ======================================================
+
+    botao_sair = tk.Button(
+        frame_topo,
+        text="Sair",
+        font=("Arial", 10, "bold"),
+        fg=BRANCO,
+        bg=VERMELHO,
+        activeforeground=BRANCO,
+        activebackground=VERMELHO_ATIVO,
+        relief="solid",
+        bd=2,
+        cursor="hand2",
+        command=sair_aplicacao
+    )
+
+    botao_sair.grid(
+        row=0,
+        column=2,
+        padx=(5, 20),
+        pady=10
+    )
 
     # ======================================================
     # LADO ESQUERDO - LISTA DE PERSONAGENS
@@ -889,13 +1522,15 @@ def mostrar_personagens():
     )
 
     frame_lista.grid(
-        row=0,
+        row=1,
         column=0,
         rowspan=2,
         sticky="nsew"
     )
 
-    # Título
+    # ======================================================
+    # TÍTULO
+    # ======================================================
 
     label_lista = tk.Label(
         frame_lista,
@@ -909,17 +1544,17 @@ def mostrar_personagens():
         pady=40
     )
 
-
-    # ------------------------------------------------------
-    # Lista
-    # ------------------------------------------------------
+    # ======================================================
+    # LISTBOX
+    # ======================================================
 
     lista_personagens = tk.Listbox(
         frame_lista,
         font=("Arial", 11),
         bg=FUNDO_WIDGET,
         fg=BRANCO,
-        bd=0,
+        bd=1,
+        relief="solid",
         highlightthickness=0,
         selectbackground=ROXO,
         selectforeground=BRANCO
@@ -932,21 +1567,253 @@ def mostrar_personagens():
         pady=10
     )
 
+    # ======================================================
+    # CARREGAR PERSONAGENS
+    # ======================================================
 
-    # Exemplos temporários
-    lista_personagens.insert(
-        tk.END,
-        "Personagem 1"
-    )
+    def carregar_personagens():
 
-    lista_personagens.insert(
-        tk.END,
-        "Personagem 2"
-    )
+        lista_personagens.delete(
+            0,
+            tk.END
+        )
 
-    lista_personagens.insert(
-        tk.END,
-        "Personagem 3"
+        try:
+
+            ligacao = sqlite3.connect("rpg.db")
+            cursor = ligacao.cursor()
+
+            cursor.execute("""
+                SELECT id, nome
+                FROM Personagens
+                WHERE utilizador_id = ?
+                ORDER BY id
+            """, (utilizador_atual_id,))
+
+            personagens = cursor.fetchall()
+
+            ligacao.close()
+
+            for personagem in personagens:
+                personagem_id = personagem[0]
+                nome = personagem[1]
+
+                lista_personagens.insert(
+                    tk.END,
+                    f"{personagem_id} - {nome}"
+                )
+
+        except sqlite3.Error as erro:
+
+            messagebox.showerror(
+                "Erro",
+                f"Não foi possível carregar as personagens:\n{erro}"
+            )
+
+    carregar_personagens()
+
+    def selecionar_personagem(event=None):
+
+        global personagem_selecionada_id
+
+        selecao = lista_personagens.curselection()
+
+        # Nenhuma personagem selecionada
+        if not selecao:
+            return
+
+        # Obter o texto selecionado
+        texto = lista_personagens.get(selecao[0])
+
+        # Exemplo:
+        # "4 - Aragorn"
+
+        try:
+            personagem_id = int(
+                texto.split(" - ")[0]
+            )
+        except (ValueError, IndexError):
+            return
+
+        personagem_selecionada_id = personagem_id
+
+        # ======================================================
+        # PESQUISAR NA BASE DE DADOS
+        # ======================================================
+
+        try:
+
+            ligacao = sqlite3.connect("rpg.db")
+            cursor = ligacao.cursor()
+
+            cursor.execute("""
+                SELECT
+                    id,
+                    nome,
+                    vida,
+                    mana,
+                    forca,
+                    agilidade,
+                    constituicao,
+                    inteligencia,
+                    sabedoria,
+                    carisma,
+                    descricao,
+                    habilidade
+
+                FROM Personagens
+
+                WHERE id = ?
+                AND utilizador_id = ?
+            """, (
+                personagem_id,
+                utilizador_atual_id
+            ))
+
+            personagem = cursor.fetchone()
+
+            ligacao.close()
+
+        except sqlite3.Error as erro:
+
+            messagebox.showerror(
+                "Erro",
+                f"Não foi possível carregar a personagem:\n{erro}"
+            )
+
+            return
+
+        # ======================================================
+        # PERSONAGEM NÃO ENCONTRADA
+        # ======================================================
+
+        if personagem is None:
+            messagebox.showerror(
+                "Erro",
+                "Não foi possível encontrar a personagem."
+            )
+
+            return
+
+        # ======================================================
+        # PREENCHER OS CAMPOS
+        # ======================================================
+
+        entrada_nome.delete(
+            0,
+            tk.END
+        )
+
+        entrada_nome.insert(
+            0,
+            personagem[1]
+        )
+
+        entrada_vida.delete(
+            0,
+            tk.END
+        )
+
+        entrada_vida.insert(
+            0,
+            personagem[2]
+        )
+
+        entrada_mana.delete(
+            0,
+            tk.END
+        )
+
+        entrada_mana.insert(
+            0,
+            personagem[3]
+        )
+
+        entrada_forca.delete(
+            0,
+            tk.END
+        )
+
+        entrada_forca.insert(
+            0,
+            personagem[4]
+        )
+
+        entrada_agilidade.delete(
+            0,
+            tk.END
+        )
+
+        entrada_agilidade.insert(
+            0,
+            personagem[5]
+        )
+
+        entrada_constituicao.delete(
+            0,
+            tk.END
+        )
+
+        entrada_constituicao.insert(
+            0,
+            personagem[6]
+        )
+
+        entrada_inteligencia.delete(
+            0,
+            tk.END
+        )
+
+        entrada_inteligencia.insert(
+            0,
+            personagem[7]
+        )
+
+        entrada_sabedoria.delete(
+            0,
+            tk.END
+        )
+
+        entrada_sabedoria.insert(
+            0,
+            personagem[8]
+        )
+
+        entrada_carisma.delete(
+            0,
+            tk.END
+        )
+
+        entrada_carisma.insert(
+            0,
+            personagem[9]
+        )
+
+        texto_descricao.delete(
+            "1.0",
+            tk.END
+        )
+
+        if personagem[10] is not None:
+            texto_descricao.insert(
+                "1.0",
+                personagem[10]
+            )
+
+        texto_habilidade.delete(
+            "1.0",
+            tk.END
+        )
+
+        if personagem[11] is not None:
+            texto_habilidade.insert(
+                "1.0",
+                personagem[11]
+            )
+
+    lista_personagens.bind(
+        "<<ListboxSelect>>",
+        selecionar_personagem
     )
 
 
@@ -960,7 +1827,7 @@ def mostrar_personagens():
     )
 
     frame_direita.grid(
-        row=0,
+        row=1,
         column=1,
         sticky="nsew"
     )
@@ -1361,7 +2228,7 @@ def mostrar_personagens():
     )
 
     frame_botoes.grid(
-        row=1,
+        row=2,
         column=1,
         sticky="ew"
     )
@@ -1426,28 +2293,216 @@ def mostrar_personagens():
 
         return botao
 
+
+
     # ======================================================
     # BOTÃO ADICIONAR
     # ======================================================
 
+
+
+    # ======================================================
+    # ADICIONAR PERSONAGEM
+    # ======================================================
+
     def adicionar_personagem():
 
+        global personagem_selecionada_id
+
+        # ==================================================
+        # OBTER DADOS DOS CAMPOS
+        # ==================================================
+
         nome = entrada_nome.get().strip()
+        vida = entrada_vida.get().strip()
+        mana = entrada_mana.get().strip()
+
+        forca = entrada_forca.get().strip()
+        agilidade = entrada_agilidade.get().strip()
+        constituicao = entrada_constituicao.get().strip()
+
+        inteligencia = entrada_inteligencia.get().strip()
+        sabedoria = entrada_sabedoria.get().strip()
+        carisma = entrada_carisma.get().strip()
+
+        descricao = texto_descricao.get(
+            "1.0",
+            tk.END
+        ).strip()
+
+        habilidade = texto_habilidade.get(
+            "1.0",
+            tk.END
+        ).strip()
+
+        # ==================================================
+        # VERIFICAR UTILIZADOR
+        # ==================================================
+
+        if utilizador_atual_id is None:
+            messagebox.showerror(
+                "Erro",
+                "Não existe nenhum utilizador autenticado."
+            )
+
+            return
+
+        # ==================================================
+        # VALIDAR NOME
+        # ==================================================
 
         if nome == "":
-
             messagebox.showwarning(
                 "Atenção",
-                "Introduza o nome do personagem."
+                "Introduza o nome da personagem."
             )
 
             entrada_nome.focus()
 
             return
 
+        # ==================================================
+        # VALIDAR VALORES NUMÉRICOS
+        # ==================================================
+
+        campos_numericos = {
+            "Vida": vida,
+            "Mana": mana,
+            "Força": forca,
+            "Agilidade": agilidade,
+            "Constituição": constituicao,
+            "Inteligência": inteligencia,
+            "Sabedoria": sabedoria,
+            "Carisma": carisma
+        }
+
+        valores = {}
+
+        for nome_campo, valor in campos_numericos.items():
+
+            if valor == "":
+                valor = "0"
+
+            try:
+
+                valor = int(valor)
+
+            except ValueError:
+
+                messagebox.showwarning(
+                    "Atenção",
+                    f"O campo '{nome_campo}' deve conter um número inteiro."
+                )
+
+                return
+
+            if valor < 0:
+                messagebox.showwarning(
+                    "Atenção",
+                    f"O campo '{nome_campo}' não pode ser negativo."
+                )
+
+                return
+
+            valores[nome_campo] = valor
+
+        # ==================================================
+        # CONFIRMAR ADIÇÃO
+        # ==================================================
+
+        resposta = messagebox.askyesno(
+            "Adicionar Personagem",
+            f"Tem a certeza que pretende adicionar a personagem "
+            f"'{nome}'?"
+        )
+
+        if not resposta:
+            return
+
+        # ==================================================
+        # INSERIR NA BASE DE DADOS
+        # ==================================================
+
+        ligacao = None
+
+        try:
+
+            ligacao = sqlite3.connect("rpg.db")
+
+            cursor = ligacao.cursor()
+
+            cursor.execute("""
+                INSERT INTO Personagens (
+                    utilizador_id,
+                    nome,
+                    vida,
+                    mana,
+                    forca,
+                    agilidade,
+                    constituicao,
+                    inteligencia,
+                    sabedoria,
+                    carisma,
+                    descricao,
+                    habilidade
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                utilizador_atual_id,
+                nome,
+                valores["Vida"],
+                valores["Mana"],
+                valores["Força"],
+                valores["Agilidade"],
+                valores["Constituição"],
+                valores["Inteligência"],
+                valores["Sabedoria"],
+                valores["Carisma"],
+                descricao,
+                habilidade
+            ))
+
+            # Guardar alterações
+            ligacao.commit()
+
+            # Obter o ID atribuído automaticamente
+            personagem_selecionada_id = cursor.lastrowid
+
+            ligacao.close()
+            ligacao = None
+
+        except sqlite3.Error as erro:
+
+            if ligacao is not None:
+                ligacao.rollback()
+                ligacao.close()
+
+            messagebox.showerror(
+                "Erro",
+                f"Não foi possível adicionar a personagem:\n\n{erro}"
+            )
+
+            return
+
+        # ==================================================
+        # ATUALIZAR LISTBOX
+        # ==================================================
+
+        carregar_personagens()
+
+        # ==================================================
+        # LIMPAR CAMPOS
+        # ==================================================
+
+        limpar_campos()
+
+        # ==================================================
+        # MOSTRAR RESULTADO
+        # ==================================================
+
         messagebox.showinfo(
             "Personagem",
-            "Personagem adicionado!"
+            f"Personagem '{nome}' adicionada com sucesso!"
         )
 
     botao_adicionar = criar_botao(
@@ -1468,9 +2523,13 @@ def mostrar_personagens():
     )
 
 
+
+
     # ======================================================
     # BOTÃO LIMPAR
     # ======================================================
+
+
 
     def limpar_campos():
 
@@ -1513,6 +2572,10 @@ def mostrar_personagens():
             tk.END
         )
 
+        global personagem_selecionada_id
+
+        personagem_selecionada_id = None
+
     botao_limpar = criar_botao(
         frame_botoes,
         "Limpar",
@@ -1531,15 +2594,249 @@ def mostrar_personagens():
     )
 
 
+
+
     # ======================================================
     # BOTÃO ALTERAR
     # ======================================================
 
+
+
+    # ======================================================
+    # ALTERAR PERSONAGEM
+    # ======================================================
+
     def alterar_personagem():
+
+        global personagem_selecionada_id
+
+        # ==================================================
+        # VERIFICAR SE EXISTE PERSONAGEM SELECIONADA
+        # ==================================================
+
+        if personagem_selecionada_id is None:
+            messagebox.showwarning(
+                "Atenção",
+                "Selecione primeiro uma personagem na lista."
+            )
+
+            return
+
+        # ==================================================
+        # OBTER DADOS DOS CAMPOS
+        # ==================================================
+
+        nome = entrada_nome.get().strip()
+        vida = entrada_vida.get().strip()
+        mana = entrada_mana.get().strip()
+
+        forca = entrada_forca.get().strip()
+        agilidade = entrada_agilidade.get().strip()
+        constituicao = entrada_constituicao.get().strip()
+
+        inteligencia = entrada_inteligencia.get().strip()
+        sabedoria = entrada_sabedoria.get().strip()
+        carisma = entrada_carisma.get().strip()
+
+        descricao = texto_descricao.get(
+            "1.0",
+            tk.END
+        ).strip()
+
+        habilidade = texto_habilidade.get(
+            "1.0",
+            tk.END
+        ).strip()
+
+        # ==================================================
+        # VALIDAR NOME
+        # ==================================================
+
+        if nome == "":
+            messagebox.showwarning(
+                "Atenção",
+                "Introduza o nome da personagem."
+            )
+
+            entrada_nome.focus()
+
+            return
+
+        # ==================================================
+        # VALIDAR VALORES NUMÉRICOS
+        # ==================================================
+
+        campos_numericos = {
+            "Vida": vida,
+            "Mana": mana,
+            "Força": forca,
+            "Agilidade": agilidade,
+            "Constituição": constituicao,
+            "Inteligência": inteligencia,
+            "Sabedoria": sabedoria,
+            "Carisma": carisma
+        }
+
+        valores = {}
+
+        for nome_campo, valor in campos_numericos.items():
+
+            if valor == "":
+                valor = "0"
+
+            try:
+
+                valor = int(valor)
+
+            except ValueError:
+
+                messagebox.showwarning(
+                    "Atenção",
+                    f"O campo '{nome_campo}' deve conter um número inteiro."
+                )
+
+                return
+
+            if valor < 0:
+                messagebox.showwarning(
+                    "Atenção",
+                    f"O campo '{nome_campo}' não pode ser negativo."
+                )
+
+                return
+
+            valores[nome_campo] = valor
+
+        # ==================================================
+        # CONFIRMAR ALTERAÇÃO
+        # ==================================================
+
+        resposta = messagebox.askyesno(
+            "Alterar Personagem",
+            f"Tem a certeza que pretende guardar as alterações "
+            f"da personagem '{nome}'?"
+        )
+
+        if not resposta:
+            return
+
+        # ==================================================
+        # ATUALIZAR BASE DE DADOS
+        # ==================================================
+
+        ligacao = None
+
+        try:
+
+            ligacao = sqlite3.connect("rpg.db")
+
+            cursor = ligacao.cursor()
+
+            cursor.execute("""
+                UPDATE Personagens
+                SET
+                    nome = ?,
+                    vida = ?,
+                    mana = ?,
+                    forca = ?,
+                    agilidade = ?,
+                    constituicao = ?,
+                    inteligencia = ?,
+                    sabedoria = ?,
+                    carisma = ?,
+                    descricao = ?,
+                    habilidade = ?
+                WHERE id = ?
+                AND utilizador_id = ?
+            """, (
+                nome,
+                valores["Vida"],
+                valores["Mana"],
+                valores["Força"],
+                valores["Agilidade"],
+                valores["Constituição"],
+                valores["Inteligência"],
+                valores["Sabedoria"],
+                valores["Carisma"],
+                descricao,
+                habilidade,
+                personagem_selecionada_id,
+                utilizador_atual_id
+            ))
+
+            # ==================================================
+            # VERIFICAR SE ALGUMA LINHA FOI ALTERADA
+            # ==================================================
+
+            if cursor.rowcount == 0:
+                ligacao.rollback()
+                ligacao.close()
+                ligacao = None
+
+                messagebox.showerror(
+                    "Erro",
+                    "A personagem não foi encontrada."
+                )
+
+                return
+
+            # Guardar alterações
+
+            ligacao.commit()
+
+            ligacao.close()
+            ligacao = None
+
+        except sqlite3.Error as erro:
+
+            if ligacao is not None:
+                ligacao.rollback()
+                ligacao.close()
+
+            messagebox.showerror(
+                "Erro",
+                f"Não foi possível alterar a personagem:\n\n{erro}"
+            )
+
+            return
+
+        # ==================================================
+        # ATUALIZAR LISTBOX
+        # ==================================================
+
+        carregar_personagens()
+
+        # ==================================================
+        # VOLTAR A SELECIONAR A PERSONAGEM
+        # ==================================================
+
+        for indice in range(lista_personagens.size()):
+
+            texto = lista_personagens.get(indice)
+
+            try:
+
+                personagem_id = int(
+                    texto.split(" - ")[0]
+                )
+
+            except (ValueError, IndexError):
+                continue
+
+            if personagem_id == personagem_selecionada_id:
+                lista_personagens.selection_set(indice)
+
+                lista_personagens.see(indice)
+
+                break
+
+        # ==================================================
+        # CONFIRMAÇÃO
+        # ==================================================
 
         messagebox.showinfo(
             "Personagem",
-            "Personagem alterado!"
+            f"Personagem '{nome}' alterada com sucesso!"
         )
 
     botao_alterar = criar_botao(
@@ -1560,23 +2857,169 @@ def mostrar_personagens():
     )
 
 
+
+
     # ======================================================
     # BOTÃO APAGAR
     # ======================================================
 
+    # ======================================================
+    # APAGAR PERSONAGEM
+    # ======================================================
+
     def apagar_personagem():
 
+        global personagem_selecionada_id
+
+        # ==================================================
+        # VERIFICAR SE EXISTE PERSONAGEM SELECIONADA
+        # ==================================================
+
+        if personagem_selecionada_id is None:
+            messagebox.showwarning(
+                "Atenção",
+                "Selecione primeiro uma personagem na lista."
+            )
+
+            return
+
+        # ==================================================
+        # OBTER NOME DA PERSONAGEM
+        # ==================================================
+
+        try:
+
+            ligacao = sqlite3.connect("rpg.db")
+            cursor = ligacao.cursor()
+
+            cursor.execute("""
+                SELECT nome
+                FROM Personagens
+                WHERE id = ?
+                AND utilizador_id = ?
+            """, (
+                personagem_selecionada_id,
+                utilizador_atual_id
+            ))
+
+            personagem = cursor.fetchone()
+
+            ligacao.close()
+
+        except sqlite3.Error as erro:
+
+            messagebox.showerror(
+                "Erro",
+                f"Não foi possível encontrar a personagem:\n\n{erro}"
+            )
+
+            return
+
+        # ==================================================
+        # PERSONAGEM NÃO ENCONTRADA
+        # ==================================================
+
+        if personagem is None:
+            messagebox.showerror(
+                "Erro",
+                "A personagem selecionada não foi encontrada."
+            )
+
+            return
+
+        nome_personagem = personagem[0]
+
+        # ==================================================
+        # PEDIR CONFIRMAÇÃO
+        # ==================================================
+
         resposta = messagebox.askyesno(
-            "Apagar",
-            "Tem a certeza que quer apagar este personagem?"
+            "Apagar Personagem",
+            f"Tem a certeza que pretende apagar a personagem "
+            f"'{nome_personagem}'?\n\n"
+            f"Esta ação não pode ser desfeita."
         )
 
-        if resposta:
+        if not resposta:
+            return
 
-            messagebox.showinfo(
-                "Personagem",
-                "Personagem apagado!"
+        # ==================================================
+        # APAGAR DA BASE DE DADOS
+        # ==================================================
+
+        ligacao = None
+
+        try:
+
+            ligacao = sqlite3.connect("rpg.db")
+            cursor = ligacao.cursor()
+
+            cursor.execute("""
+                DELETE FROM Personagens
+                WHERE id = ?
+                AND utilizador_id = ?
+            """, (
+                personagem_selecionada_id,
+                utilizador_atual_id
+            ))
+
+            # Verificar se foi realmente apagada
+            if cursor.rowcount == 0:
+                ligacao.rollback()
+                ligacao.close()
+                ligacao = None
+
+                messagebox.showerror(
+                    "Erro",
+                    "Não foi possível apagar a personagem."
+                )
+
+                return
+
+            ligacao.commit()
+
+            ligacao.close()
+            ligacao = None
+
+        except sqlite3.Error as erro:
+
+            if ligacao is not None:
+                ligacao.rollback()
+                ligacao.close()
+
+            messagebox.showerror(
+                "Erro",
+                f"Não foi possível apagar a personagem:\n\n{erro}"
             )
+
+            return
+
+        # ==================================================
+        # LIMPAR ID DA PERSONAGEM SELECIONADA
+        # ==================================================
+
+        personagem_selecionada_id = None
+
+        # ==================================================
+        # ATUALIZAR LISTBOX
+        # ==================================================
+
+        carregar_personagens()
+
+        # ==================================================
+        # LIMPAR CAMPOS
+        # ==================================================
+
+        limpar_campos()
+
+        # ==================================================
+        # CONFIRMAÇÃO
+        # ==================================================
+
+        messagebox.showinfo(
+            "Personagem",
+            f"A personagem '{nome_personagem}' foi apagada com sucesso!"
+        )
 
     botao_apagar = criar_botao(
         frame_botoes,
@@ -1596,19 +3039,10 @@ def mostrar_personagens():
     )
 
 
-# ==========================================================
-# ABRIR A APLICAÇÃO
-# ==========================================================
-
-mostrar_personagens()
-
-janela.mainloop()
-
-
 # =========================================================
 # INICIAR NA PÁGINA DE LOGIN
 # =========================================================
 
-#mostrar_login()
+mostrar_login()
 
-#janela.mainloop()
+janela.mainloop()

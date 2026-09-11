@@ -37,8 +37,6 @@ class Database:
         # PERSONAGENS
         # ==========================
 
-        cursor.execute("""Drop TABLE IF EXISTS Personagens;""")
-
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS Personagens (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
