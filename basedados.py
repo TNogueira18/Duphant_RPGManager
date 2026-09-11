@@ -43,12 +43,26 @@ class Database:
         CREATE TABLE IF NOT EXISTS Personagens (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             utilizador_id INTEGER NOT NULL,
+        
             nome TEXT NOT NULL,
-
+        
+            vida INTEGER DEFAULT 0,
+            mana INTEGER DEFAULT 0,
+        
+            forca INTEGER DEFAULT 0,
+            agilidade INTEGER DEFAULT 0,
+            constituicao INTEGER DEFAULT 0,
+            inteligencia INTEGER DEFAULT 0,
+            sabedoria INTEGER DEFAULT 0,
+            carisma INTEGER DEFAULT 0,
+        
+            descricao TEXT,
+            habilidade TEXT,
+        
             FOREIGN KEY (utilizador_id)
                 REFERENCES Utilizadores(id)
                 ON DELETE CASCADE
-        )
+        );
         """)
 
         ligacao.commit()
